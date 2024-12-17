@@ -1,0 +1,19 @@
+<div class="effort">
+  <h1>Community Love</h1>
+  <section>
+    <button phx-click="add" phx-value-quantity="1">
+      +1
+    </button>
+    <div>
+      {@responders}
+    </div>
+    &times;
+    <div>
+      {@minutes_per_responder}
+    </div>
+    =
+    <div>
+      {@responders * @minutes_per_responder}
+    </div>
+  </section>
+</div>

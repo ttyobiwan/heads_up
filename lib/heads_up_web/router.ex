@@ -18,12 +18,14 @@ defmodule HeadsUpWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/tips", TipController, :index
+    get "/tips/:id", TipController, :show
+    live "/effort", EffortLive
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", HeadsUpWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", HeadsUpWeb do
+    pipe_through :api
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:heads_up, :dev_routes) do

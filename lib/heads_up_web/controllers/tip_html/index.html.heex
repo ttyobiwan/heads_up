@@ -1,0 +1,10 @@
+<div class="tips">
+  <h1>Safety Tips</h1>
+  <ol>
+    <li :for={tip <- @tips} id={Integer.to_string(tip.id)}>
+      <a href={~p"/tips/#{tip.id}"}>
+        {tip.text}
+      </a>
+    </li>
+  </ol>
+</div>
