@@ -1,0 +1,18 @@
+<div class="incident-index">
+  <.headline>
+    <.icon name="hero-trophy-mini" /> 25 Incidents Resolved This Month!
+    <:tagline :let={emoji}>
+      Thanks for pitching in. {emoji}
+    </:tagline>
+    <:tagline>
+      You are the GOAT. 🐐
+    </:tagline>
+  </.headline>
+  <div class="incidents">
+    <.incident_card
+      :for={incident <- @incidents}
+      id={Integer.to_string(incident.id)}
+      incident={incident}
+    />
+  </div>
+</div>

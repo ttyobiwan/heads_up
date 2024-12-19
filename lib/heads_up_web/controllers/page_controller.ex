@@ -1,9 +1,7 @@
 defmodule HeadsUpWeb.PageController do
   use HeadsUpWeb, :controller
 
-  def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    render(conn, :home, layout: false)
+  def home(conn, _) do
+    redirect(conn, to: ~p"/incidents")
   end
 end
