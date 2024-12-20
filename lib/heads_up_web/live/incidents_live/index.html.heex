@@ -8,10 +8,10 @@
       You are the GOAT. 🐐
     </:tagline>
   </.headline>
-  <div class="incidents">
+  <div class="incidents" id="incidents" phx-update="stream">
     <.incident_card
-      :for={incident <- @incidents}
-      id={Integer.to_string(incident.id)}
+      :for={{dom_id, incident} <- @streams.incidents}
+      id={dom_id}
       incident={incident}
     />
   </div>
