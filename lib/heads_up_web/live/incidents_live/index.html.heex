@@ -8,7 +8,14 @@
       You are the GOAT. 🐐
     </:tagline>
   </.headline>
+
+  <.filter_form form={@form} id="incidents-filters" phx-change="filter" />
+
   <div class="incidents" id="incidents" phx-update="stream">
+    <div id="empty" class="no-results only:block hidden">
+      No incidents found. Try changing your filters.
+    </div>
+
     <.incident_card
       :for={{dom_id, incident} <- @streams.incidents}
       id={dom_id}

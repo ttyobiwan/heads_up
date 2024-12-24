@@ -17,7 +17,7 @@
   <div class="activity">
     <div class="left"></div>
     <div class="right">
-      <.urgent_incidents incidents={Incidents.list_urgent_incidents(@incident)} />
+      <.urgent_incidents incidents={@urgent_incidents} />
       <.back navigate={~p"/incidents"}>Back to incidents</.back>
     </div>
   </div>
