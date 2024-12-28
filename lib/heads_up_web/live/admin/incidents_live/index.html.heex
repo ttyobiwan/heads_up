@@ -1,0 +1,14 @@
+<div class="admin-index">
+  <.header>{@page_title}</.header>
+  <.table id="incidents-table" rows={@streams.incidents}>
+    <:col :let={{_, incident}} label="Incident">
+      <.link navigate={"/incidents/#{incident.id}"}>{incident.name}</.link>
+    </:col>
+    <:col :let={{_, incident}} label="Status">
+      <.badge status={incident.status} />
+    </:col>
+    <:col :let={{_, incident}} label="Priority">
+      {incident.priority}
+    </:col>
+  </.table>
+</div>

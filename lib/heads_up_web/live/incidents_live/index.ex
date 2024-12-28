@@ -1,7 +1,7 @@
 defmodule HeadsUpWeb.IncidentsLive.Index do
   use HeadsUpWeb, :live_view
-  import HeadsUpWeb.{BadgeComponents, HeadlineComponents}
 
+  import HeadsUpWeb.{BadgeComponents, HeadlineComponents}
   alias Phoenix.HTML.Form
   alias HeadsUp.Incidents
   alias HeadsUp.Incidents.Incident
@@ -17,6 +17,16 @@ defmodule HeadsUpWeb.IncidentsLive.Index do
      socket
      |> assign(form: to_form(params))
      |> stream(:incidents, Incidents.filter_home_incidents(params), reset: true)}
+  end
+
+  def handle_event("filter", params, socket) do
+    params =
+      params
+      |> Map.take(~w(q status sort_by))
+      # Remove empty state, including filter defaults
+      |> Map.reject(fn {_, v} -> v in ["", "status", "sort_by"] end)
+
+    {:noreply, push_patch(socket, to: ~p"/incidents?#{params}")}
   end
 
   attr :form, Form, required: true
@@ -61,14 +71,5 @@ defmodule HeadsUpWeb.IncidentsLive.Index do
       </div>
     </.link>
     """
-  end
-
-  def handle_event("filter", params, socket) do
-    params =
-      params
-      |> Map.take(~w(q status sort_by))
-      |> Map.reject(fn {_, v} -> v in ["", "status", "sort_by"] end)
-
-    {:noreply, push_patch(socket, to: ~p"/incidents?#{params}")}
   end
 end

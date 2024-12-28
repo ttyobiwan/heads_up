@@ -26,6 +26,8 @@ defmodule HeadsUpWeb.Router do
 
     live "/incidents", IncidentsLive.Index
     live "/incidents/:id", IncidentsLive.Show
+
+    live "/admin", Admin.IncidentsLive.Index
   end
 
   scope "/api", HeadsUpWeb do
