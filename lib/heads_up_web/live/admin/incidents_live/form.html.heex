@@ -1,0 +1,25 @@
+<.header>{@page_title}</.header>
+
+<.simple_form for={@form} phx-submit="save" phx-change="change" id="incident-form">
+  <.input field={@form[:name]} phx-debounce="blur" label="Name" type="text" required />
+  <.input field={@form[:priority]} label="Priority" type="number" />
+  <.input
+    field={@form[:status]}
+    label="Status"
+    type="select"
+    options={[Status: "status", Pending: "pending", Resolved: "resolved", Cancelled: "cancelled"]}
+  />
+  <.input
+    field={@form[:description]}
+    label="Description"
+    type="textarea"
+    phx-debounce="blur"
+    required
+  />
+  <.input field={@form[:image_path]} label="Image" type="url" />
+  <:actions>
+    <.button type="submit" phx-disable-with="Saving...">Save</.button>
+  </:actions>
+</.simple_form>
+
+<.back navigate={~p"/admin/incidents"}>Go Back</.back>

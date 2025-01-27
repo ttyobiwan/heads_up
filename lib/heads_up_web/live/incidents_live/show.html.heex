@@ -1,6 +1,6 @@
 <div class="incident-show">
   <div class="incident">
-    <img src={@incident.image_path} />
+    <img src={@incident.image_path || "/images/placeholder.jpg"} />
     <section>
       <.badge status={@incident.status} />
       <header>

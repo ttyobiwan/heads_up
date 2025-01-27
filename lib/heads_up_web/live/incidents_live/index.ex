@@ -60,7 +60,7 @@ defmodule HeadsUpWeb.IncidentsLive.Index do
     ~H"""
     <.link navigate={~p"/incidents/#{@incident.id}"} {@rest}>
       <div class="card">
-        <img src={@incident.image_path} />
+        <img src={@incident.image_path || "/images/placeholder.jpg"} />
         <h2>{@incident.name}</h2>
         <div class="details">
           <.badge status={@incident.status} />

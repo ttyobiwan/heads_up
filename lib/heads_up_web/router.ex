@@ -27,7 +27,9 @@ defmodule HeadsUpWeb.Router do
     live "/incidents", IncidentsLive.Index
     live "/incidents/:id", IncidentsLive.Show
 
-    live "/admin", Admin.IncidentsLive.Index
+    live "/admin/incidents", Admin.IncidentsLive.Index
+    live "/admin/incidents/new", Admin.IncidentsLive.Form, :new
+    live "/admin/incidents/:id/edit", Admin.IncidentsLive.Form, :edit
   end
 
   scope "/api", HeadsUpWeb do

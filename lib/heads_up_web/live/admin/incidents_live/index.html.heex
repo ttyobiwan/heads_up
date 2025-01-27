@@ -1,8 +1,24 @@
 <div class="admin-index">
-  <.header>{@page_title}</.header>
-  <.table id="incidents-table" rows={@streams.incidents}>
+  <.button phx-click={JS.toggle(to: "#joke")}>
+    Toggle Joke
+  </.button>
+  <div id="joke" class="joke hidden">
+    Why shouldn't you trust trees?
+  </div>
+
+  <.header>
+    {@page_title}
+    <:actions>
+      <.link navigate={~p"/admin/incidents/new"} class="button">New Incident</.link>
+    </:actions>
+  </.header>
+  <.table
+    id="incidents-table"
+    rows={@streams.incidents}
+    row_click={fn {_, incident} -> JS.navigate(~p"/incidents/#{incident.id}") end}
+  >
     <:col :let={{_, incident}} label="Incident">
-      <.link navigate={"/incidents/#{incident.id}"}>{incident.name}</.link>
+      <.link navigate={~p"/incidents/#{incident.id}"}>{incident.name}</.link>
     </:col>
     <:col :let={{_, incident}} label="Status">
       <.badge status={incident.status} />
@@ -10,5 +26,20 @@
     <:col :let={{_, incident}} label="Priority">
       {incident.priority}
     </:col>
+    <:action :let={{_, incident}}>
+      <.link navigate={~p"/admin/incidents/#{incident.id}/edit"}>Edit</.link>
+    </:action>
+    <:action :let={{dom_id, incident}}>
+      <%!-- <.link phx-click="delete" phx-value-id={incident.id} data-confirm="Are you sure?"> --%>
+      <.link
+        phx-click={
+          JS.push("delete", value: %{id: incident.id})
+          |> JS.hide(to: "##{dom_id}", transition: "fade-out")
+        }
+        data-confirm="Are you sure?"
+      >
+        Delete
+      </.link>
+    </:action>
   </.table>
 </div>

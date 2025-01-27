@@ -18,7 +18,7 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
         Incidents.list_urgent_incidents(incident)
       end)
 
-    # We do start_async instead of:
+    # We do start_async+handle_async instead of:
     # |> assign_async(:urgent_incidents, fn ->
     #   # {:error, "couldn't get urgent incidents"}
     #   {:ok, %{urgent_incidents: Incidents.list_urgent_incidents(incident)}}
@@ -63,7 +63,7 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
         <ul class="incidents">
           <li :for={incident <- result}>
             <.link navigate={~p"/incidents/#{incident.id}"}>
-              <img src={incident.image_path} />{incident.name}
+              <img src={incident.image_path || "/images/placeholder.jpg"} />{incident.name}
             </.link>
           </li>
         </ul>
