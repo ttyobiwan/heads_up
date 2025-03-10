@@ -9,7 +9,7 @@
     </:tagline>
   </.headline>
 
-  <.filter_form form={@form} id="incidents-filters" phx-change="filter" />
+  <.filter_form form={@form} categories={@categories} id="incidents-filters" phx-change="filter" />
 
   <div class="incidents" id="incidents" phx-update="stream">
     <div id="empty" class="no-results only:block hidden">

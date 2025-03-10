@@ -1,16 +1,22 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     HeadsUp.Repo.insert!(%HeadsUp.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
 alias HeadsUp.Repo
 alias HeadsUp.Incidents.Incident
+alias HeadsUp.Categories.Category
+
+animals =
+  %Category{name: "Animals & Wildlife", slug: "animals-and-wildlife"}
+  |> Repo.insert!()
+
+technology =
+  %Category{name: "Technology", slug: "technology"}
+  |> Repo.insert!()
+
+vehicles =
+  %Category{name: "Vehicles", slug: "vehicles"}
+  |> Repo.insert!()
+
+nature =
+  %Category{name: "Nature", slug: "nature"}
+  |> Repo.insert!()
 
 %Incident{
   name: "Lost Dog",
@@ -19,7 +25,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 2,
   status: :pending,
-  image_path: "/images/lost-dog.jpg"
+  image_path: "/images/lost-dog.jpg",
+  category: animals
 }
 |> Repo.insert!()
 
@@ -30,7 +37,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 1,
   status: :cancelled,
-  image_path: "/images/tree-down.jpg"
+  image_path: "/images/tree-down.jpg",
+  category: nature
 }
 |> Repo.insert!()
 
@@ -41,7 +49,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 2,
   status: :pending,
-  image_path: "/images/snowplow-stuck.jpg"
+  image_path: "/images/snowplow-stuck.jpg",
+  category: vehicles
 }
 |> Repo.insert!()
 
@@ -52,7 +61,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 2,
   status: :resolved,
-  image_path: "/images/website-down.jpg"
+  image_path: "/images/website-down.jpg",
+  category: technology
 }
 |> Repo.insert!()
 
@@ -63,7 +73,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 1,
   status: :cancelled,
-  image_path: "/images/bear-in-trash.jpg"
+  image_path: "/images/bear-in-trash.jpg",
+  category: animals
 }
 |> Repo.insert!()
 
@@ -74,7 +85,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 2,
   status: :resolved,
-  image_path: "/images/pumpkin-patch.jpg"
+  image_path: "/images/pumpkin-patch.jpg",
+  category: nature
 }
 |> Repo.insert!()
 
@@ -85,7 +97,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 3,
   status: :pending,
-  image_path: "/images/moose-on-loose.jpg"
+  image_path: "/images/moose-on-loose.jpg",
+  category: animals
 }
 |> Repo.insert!()
 
@@ -96,7 +109,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 1,
   status: :resolved,
-  image_path: "/images/flat-tire.jpg"
+  image_path: "/images/flat-tire.jpg",
+  category: vehicles
 }
 |> Repo.insert!()
 
@@ -107,7 +121,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 3,
   status: :resolved,
-  image_path: "/images/cat-in-tree.jpg"
+  image_path: "/images/cat-in-tree.jpg",
+  category: animals
 }
 |> Repo.insert!()
 
@@ -118,7 +133,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 3,
   status: :pending,
-  image_path: "/images/annoying-drone.jpg"
+  image_path: "/images/annoying-drone.jpg",
+  category: technology
 }
 |> Repo.insert!()
 
@@ -129,7 +145,8 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 3,
   status: :pending,
-  image_path: "/images/washed-out-trail.jpg"
+  image_path: "/images/washed-out-trail.jpg",
+  category: nature
 }
 |> Repo.insert!()
 
@@ -140,6 +157,7 @@ alias HeadsUp.Incidents.Incident
   """,
   priority: 3,
   status: :cancelled,
-  image_path: "/images/suspicious-vehicle.jpg"
+  image_path: "/images/suspicious-vehicle.jpg",
+  category: vehicles
 }
 |> Repo.insert!()

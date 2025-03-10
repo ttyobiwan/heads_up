@@ -17,7 +17,7 @@ defmodule HeadsUpWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import HeadsUpWeb.Gettext
+  use Gettext, backend: HeadsUpWeb.Gettext
 
   @doc """
   Renders a modal.

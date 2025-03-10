@@ -1,15 +1,18 @@
 defmodule HeadsUpWeb.IncidentsLive.Index do
-  use HeadsUpWeb, :live_view
-
+  alias HeadsUp.Categories
   import HeadsUpWeb.{BadgeComponents, HeadlineComponents}
   alias Phoenix.HTML.Form
+  use HeadsUpWeb, :live_view
   alias HeadsUp.Incidents
   alias HeadsUp.Incidents.Incident
 
   def mount(_, _, socket) do
-    {:ok,
-     socket
-     |> assign(page_title: "Incidents")}
+    socket =
+      socket
+      |> assign(page_title: "Incidents")
+      |> assign(categories: Categories.get_category_options([:name, :slug]))
+
+    {:ok, socket}
   end
 
   def handle_params(params, _, socket) do
@@ -22,7 +25,7 @@ defmodule HeadsUpWeb.IncidentsLive.Index do
   def handle_event("filter", params, socket) do
     params =
       params
-      |> Map.take(~w(q status sort_by))
+      |> Map.take(~w(q status category sort_by))
       # Remove empty state, including filter defaults
       |> Map.reject(fn {_, v} -> v in ["", "status", "sort_by"] end)
 
@@ -30,6 +33,7 @@ defmodule HeadsUpWeb.IncidentsLive.Index do
   end
 
   attr :form, Form, required: true
+  attr :categories, :list, required: true
   attr :rest, :global
 
   def filter_form(assigns) do
@@ -39,14 +43,15 @@ defmodule HeadsUpWeb.IncidentsLive.Index do
       <.input
         field={@form[:status]}
         type="select"
-        placeholder="Status"
-        options={[Status: "status", Pending: "pending", Resolved: "resolved", Cancelled: "cancelled"]}
+        prompt="Status"
+        options={[Pending: "pending", Resolved: "resolved", Cancelled: "cancelled"]}
       />
+      <.input field={@form[:category]} type="select" prompt="Category" options={@categories} />
       <.input
         field={@form[:sort_by]}
         type="select"
-        placeholder="Sort by"
-        options={["Sort By": "sort_by", Name: "name", Priority: "priority"]}
+        prompt="Sort by"
+        options={[Name: "name", Priority: "priority", Category: "category"]}
       />
       <.link patch={~p"/incidents"}>Reset</.link>
     </.form>
@@ -60,6 +65,9 @@ defmodule HeadsUpWeb.IncidentsLive.Index do
     ~H"""
     <.link navigate={~p"/incidents/#{@incident.id}"} {@rest}>
       <div class="card">
+        <div class="category">
+          {@incident.category.name}
+        </div>
         <img src={@incident.image_path || "/images/placeholder.jpg"} />
         <h2>{@incident.name}</h2>
         <div class="details">

@@ -17,6 +17,13 @@
     required
   />
   <.input field={@form[:image_path]} label="Image" type="url" />
+  <.input
+    field={@form[:category_id]}
+    label="Category"
+    type="select"
+    options={@categories}
+    prompt="Choose a category"
+  />
   <:actions>
     <.button type="submit" phx-disable-with="Saving...">Save</.button>
   </:actions>

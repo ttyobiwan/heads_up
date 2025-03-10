@@ -30,10 +30,21 @@ defmodule HeadsUpWeb.Router do
     live "/admin/incidents", Admin.IncidentsLive.Index
     live "/admin/incidents/new", Admin.IncidentsLive.Form, :new
     live "/admin/incidents/:id/edit", Admin.IncidentsLive.Form, :edit
+
+    live "/categories", CategoryLive.Index, :index
+    live "/categories/new", CategoryLive.Form, :new
+    live "/categories/:id", CategoryLive.Show, :show
+    live "/categories/:id/edit", CategoryLive.Form, :edit
   end
 
-  scope "/api", HeadsUpWeb do
+  scope "/api", HeadsUpWeb.Api do
     pipe_through :api
+
+    get "/incidents", IncidentController, :index
+    get "/incidents/:id", IncidentController, :show
+    post "/incidents", IncidentController, :create
+
+    get "/categories/:id/incidents", CategoriesController, :show_incidents
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

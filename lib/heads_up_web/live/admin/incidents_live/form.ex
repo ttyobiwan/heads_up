@@ -1,6 +1,7 @@
 defmodule HeadsUpWeb.Admin.IncidentsLive.Form do
-  alias HeadsUp.Incidents.Incident
+  alias HeadsUp.Categories
   use HeadsUpWeb, :live_view
+  alias HeadsUp.Incidents.Incident
   alias HeadsUp.Incidents.Admin
 
   def mount(params, _, socket) do
@@ -20,20 +21,24 @@ defmodule HeadsUpWeb.Admin.IncidentsLive.Form do
   defp set_action(:new, socket, _) do
     incident = %Incident{}
     cs = Incident.changeset(incident, %{})
+    categories = Categories.get_category_options([:name, :id])
 
     socket
     |> assign(page_title: "New Incident")
     |> assign(incident: incident)
+    |> assign(categories: categories)
     |> assign(form: to_form(cs))
   end
 
   defp set_action(:edit, socket, %{"id" => id}) do
     incident = Admin.get_incident!(id)
     cs = Incident.changeset(incident, %{})
+    categories = Categories.get_category_options([:name, :id])
 
     socket
     |> assign(page_title: "Edit Incident")
     |> assign(incident: incident)
+    |> assign(categories: categories)
     |> assign(form: to_form(cs))
   end
 

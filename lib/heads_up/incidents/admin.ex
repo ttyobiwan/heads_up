@@ -19,6 +19,10 @@ defmodule HeadsUp.Incidents.Admin do
     Repo.get!(Incident, id)
   end
 
+  # def get_incident_with_category!(id) do
+  #   get_incident!(id) |> Repo.preload(:category)
+  # end
+
   def update_incident(incident, params) do
     incident
     |> Incident.changeset(params)

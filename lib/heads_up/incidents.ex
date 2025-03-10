@@ -1,6 +1,7 @@
 defmodule HeadsUp.Incidents do
   import Ecto.Query
 
+  alias HeadsUp.Categories.Category
   alias HeadsUp.Repo
   alias HeadsUp.Incidents.Incident
 
@@ -16,6 +17,14 @@ defmodule HeadsUp.Incidents do
     Repo.get(Incident, id)
   end
 
+  def get_incident_with_category(id) do
+    get_incident(id) |> Repo.preload(:category)
+  end
+
+  def get_incidents_by_category(category_id) do
+    Repo.all(from i in Incident, where: i.category_id == ^category_id)
+  end
+
   def list_home_incidents() do
     Repo.all(Incident)
   end
@@ -24,7 +33,9 @@ defmodule HeadsUp.Incidents do
     Incident
     |> with_search(params["q"])
     |> with_status(params["status"])
+    |> with_category(params["category"])
     |> with_sort_by(params["sort_by"])
+    |> preload(:category)
     |> Repo.all()
   end
 
@@ -34,7 +45,17 @@ defmodule HeadsUp.Incidents do
   defp with_status(query, status) when status in ["status", "", nil], do: query
   defp with_status(query, status), do: where(query, [i], i.status == ^status)
 
+  defp with_category(query, category) when category in ["", nil], do: query
+
+  defp with_category(query, category),
+    do:
+      from(i in query, join: c in Category, on: c.id == i.category_id, where: c.slug == ^category)
+
   defp with_sort_by(query, sort_by) when sort_by in ["sort_by", "", nil], do: query
+
+  defp with_sort_by(query, "category"),
+    do: from(i in query, join: c in assoc(i, :category), order_by: c.name)
+
   defp with_sort_by(query, sort_by), do: order_by(query, desc: ^String.to_existing_atom(sort_by))
 
   def list_urgent_incidents(selected_incident) do

@@ -6,7 +6,7 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
   import HeadsUpWeb.BadgeComponents
 
   def mount(%{"id" => id}, _, socket) do
-    incident = Incidents.get_incident(String.to_integer(id))
+    incident = Incidents.get_incident_with_category(String.to_integer(id))
 
     socket =
       socket
