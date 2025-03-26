@@ -1,6 +1,5 @@
 defmodule HeadsUpWeb.CategoryLive.Index do
   use HeadsUpWeb, :live_view
-
   alias HeadsUp.Categories
 
   @impl true
