@@ -1,17 +1,22 @@
 defmodule HeadsUpWeb.IncidentsLive.Show do
   use HeadsUpWeb, :live_view
+  alias HeadsUp.Responses.Response
+  alias HeadsUp.Responses
   alias Phoenix.LiveView.AsyncResult
-
   alias HeadsUp.Incidents
   import HeadsUpWeb.BadgeComponents
 
   def mount(%{"id" => id}, _, socket) do
     incident = Incidents.get_incident_with_category(String.to_integer(id))
+    responses = Incidents.list_responses(incident)
 
     socket =
       socket
       |> assign(:page_title, incident.name)
       |> assign(:incident, incident)
+      |> assign(:form, to_form(Responses.change_response(%Response{})))
+      |> stream(:responses, responses)
+      |> assign(:responses_count, Enum.count(responses))
       |> assign(:urgent_incidents, AsyncResult.loading())
       |> start_async(:fetch_urgent_incidents, fn ->
         IO.puts("Fetching urgent incidents")
@@ -45,6 +50,36 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
     {:noreply, assign(socket, :urgent_incidents, result)}
   end
 
+  def handle_event("validate", %{"response" => response}, socket) do
+    changeset = Responses.change_response(%Response{}, response)
+    socket = assign(socket, :form, to_form(changeset, action: :validate))
+    {:noreply, socket}
+  end
+
+  def handle_event("save", %{"response" => response}, socket) do
+    %{incident: incident, current_user: user} = socket.assigns
+
+    case Responses.create_response(incident, user, response) do
+      {:ok, created_response} ->
+        socket =
+          socket
+          |> assign(:form, to_form(Responses.change_response(%Response{})))
+          |> stream_insert(:responses, created_response, at: 0)
+          |> update(:responses_count, fn v -> v + 1 end)
+          |> put_flash(:info, "Response created successfully")
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        socket =
+          socket
+          |> assign(:form, to_form(changeset))
+          |> put_flash(:error, "Failed to create response")
+
+        {:noreply, socket}
+    end
+  end
+
   attr :incidents, :list, required: true
 
   def urgent_incidents(assigns) do
@@ -69,6 +104,30 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
         </ul>
       </.async_result>
     </section>
+    """
+  end
+
+  def response(assigns) do
+    ~H"""
+    <div class="response">
+      <span class="timeline"></span>
+      <section>
+        <div class="avatar">
+          <.icon name="hero-user-solid" />
+        </div>
+        <div>
+          <span class="username">
+            {@response.user.username}
+          </span>
+          <span>
+            {@response.status}
+          </span>
+          <blockquote>
+            {@response.note}
+          </blockquote>
+        </div>
+      </section>
+    </div>
     """
   end
 end

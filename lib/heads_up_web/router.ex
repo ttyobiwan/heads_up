@@ -27,7 +27,10 @@ defmodule HeadsUpWeb.Router do
     live "/effort", EffortLive
 
     live "/incidents", IncidentsLive.Index
-    live "/incidents/:id", IncidentsLive.Show
+
+    live_session(:incident, on_mount: {HeadsUpWeb.UserAuth, :mount_current_user}) do
+      live "/incidents/:id", IncidentsLive.Show
+    end
   end
 
   scope "/", HeadsUpWeb do

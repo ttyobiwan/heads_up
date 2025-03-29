@@ -4,7 +4,15 @@ defmodule HeadsUpWeb.Api.IncidentJSON do
   end
 
   def show(%{incident: i}) do
-    to_json(i)
+    i
+    |> to_json()
+    |> Map.merge(%{
+      category: %{
+        name: i.category.name,
+        slug: i.category.slug
+      },
+      responses: Enum.map(i.responses, fn resp -> %{id: resp.id} end)
+    })
   end
 
   def create(%{incident: i}) do

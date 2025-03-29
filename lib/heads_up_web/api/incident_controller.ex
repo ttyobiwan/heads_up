@@ -9,7 +9,7 @@ defmodule HeadsUpWeb.Api.IncidentController do
   end
 
   def show(conn, %{"id" => id}) do
-    case Incidents.get_incident(id) do
+    case Incidents.get_incident(id, [:category, responses: :users]) do
       nil ->
         conn
         |> put_status(:not_found)

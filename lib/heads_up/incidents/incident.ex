@@ -10,6 +10,8 @@ defmodule HeadsUp.Incidents.Incident do
     field :image_path, :string, default: nil
 
     belongs_to :category, HeadsUp.Categories.Category
+    has_many :responses, HeadsUp.Responses.Response
+    # preload_order: [desc: :inserted_at]
 
     timestamps(type: :utc_datetime)
   end
