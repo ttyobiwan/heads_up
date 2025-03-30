@@ -26,6 +26,9 @@
     <:col :let={{_, incident}} label="Priority">
       {incident.priority}
     </:col>
+    <:col :let={{_, incident}} label="Heroic">
+      {incident.heroic_response_id}
+    </:col>
     <:action :let={{_, incident}}>
       <.link navigate={~p"/admin/incidents/#{incident.id}/edit"}>Edit</.link>
     </:action>
@@ -40,6 +43,9 @@
       >
         Delete
       </.link>
+    </:action>
+    <:action :let={{_, incident}}>
+      <.link phx-click="draw-heroic" phx-value-id={incident.id}>Draw Heroic</.link>
     </:action>
   </.table>
 </div>

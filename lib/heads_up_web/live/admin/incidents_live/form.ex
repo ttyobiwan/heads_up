@@ -1,4 +1,5 @@
 defmodule HeadsUpWeb.Admin.IncidentsLive.Form do
+  alias HeadsUp.Incidents
   alias HeadsUp.Categories
   use HeadsUpWeb, :live_view
   alias HeadsUp.Incidents.Incident
@@ -61,6 +62,8 @@ defmodule HeadsUpWeb.Admin.IncidentsLive.Form do
   defp save_incident(:edit, params, socket) do
     case Admin.update_incident(socket.assigns.incident, params) do
       {:ok, incident} ->
+        Incidents.broadcast(incident.id, {:incident_updated, incident})
+
         socket =
           socket
           |> put_flash(:info, "Incident '#{incident.name}' updated successfully")

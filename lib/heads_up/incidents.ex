@@ -21,6 +21,18 @@ defmodule HeadsUp.Incidents do
     |> Repo.all()
   end
 
+  def subscribe(id) do
+    Phoenix.PubSub.subscribe(HeadsUp.PubSub, "incidents-#{id}")
+  end
+
+  def broadcast(id, message) do
+    Phoenix.PubSub.broadcast(HeadsUp.PubSub, "incidents-#{id}", message)
+  end
+
+  def get_incident!(id) do
+    Repo.get!(Incident, id)
+  end
+
   def get_incident(id) do
     Repo.get(Incident, id)
   end
@@ -51,6 +63,24 @@ defmodule HeadsUp.Incidents do
     |> Repo.all()
   end
 
+  def list_urgent_incidents(selected_incident) do
+    Repo.all(
+      from i in Incident,
+        where: i.status == :pending and i.id != ^selected_incident.id,
+        order_by: [desc: i.priority],
+        limit: 3
+    )
+  end
+
+  @doc """
+  Updates an incident.
+  """
+  def update_incident(%Incident{} = incident, attrs) do
+    incident
+    |> Incident.changeset(attrs)
+    |> Repo.update()
+  end
+
   defp with_search(query, q) when q in ["", nil], do: query
   defp with_search(query, q), do: where(query, [i], ilike(i.name, ^"%#{q}%"))
 
@@ -69,13 +99,4 @@ defmodule HeadsUp.Incidents do
     do: from(i in query, join: c in assoc(i, :category), order_by: c.name)
 
   defp with_sort_by(query, sort_by), do: order_by(query, desc: ^String.to_existing_atom(sort_by))
-
-  def list_urgent_incidents(selected_incident) do
-    Repo.all(
-      from i in Incident,
-        where: i.status == :pending and i.id != ^selected_incident.id,
-        order_by: [desc: i.priority],
-        limit: 3
-    )
-  end
 end

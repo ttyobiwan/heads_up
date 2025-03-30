@@ -1,20 +1,28 @@
 defmodule HeadsUpWeb.IncidentsLive.Show do
   use HeadsUpWeb, :live_view
+  import HeadsUpWeb.{HeadlineComponents}
   alias HeadsUp.Responses.Response
   alias HeadsUp.Responses
   alias Phoenix.LiveView.AsyncResult
   alias HeadsUp.Incidents
   import HeadsUpWeb.BadgeComponents
 
-  def mount(%{"id" => id}, _, socket) do
-    incident = Incidents.get_incident_with_category(String.to_integer(id))
+  def mount(_, _, socket) do
+    {:ok, assign(socket, :form, to_form(Responses.change_response(%Response{})))}
+  end
+
+  def handle_params(%{"id" => id}, _uri, socket) do
+    if connected?(socket) do
+      Incidents.subscribe(id)
+    end
+
+    incident = Incidents.get_incident(id, [:category, heroic_response: :user])
     responses = Incidents.list_responses(incident)
 
     socket =
       socket
       |> assign(:page_title, incident.name)
       |> assign(:incident, incident)
-      |> assign(:form, to_form(Responses.change_response(%Response{})))
       |> stream(:responses, responses)
       |> assign(:responses_count, Enum.count(responses))
       |> assign(:urgent_incidents, AsyncResult.loading())
@@ -29,7 +37,24 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
     #   {:ok, %{urgent_incidents: Incidents.list_urgent_incidents(incident)}}
     # end)
 
-    {:ok, socket}
+    {:noreply, socket}
+  end
+
+  def handle_info({:response_created, response}, socket) do
+    IO.puts("created")
+
+    socket =
+      socket
+      |> stream_insert(:responses, response, at: 0)
+      |> update(:responses_count, fn v -> v + 1 end)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:incident_updated, incident}, socket) do
+    IO.puts("updated")
+    socket = socket |> assign(:incident, incident) |> put_flash(:info, "Incident got updated")
+    {:noreply, socket}
   end
 
   def handle_async(:fetch_urgent_incidents, {:ok, incidents}, socket) do
@@ -61,6 +86,8 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
 
     case Responses.create_response(incident, user, response) do
       {:ok, created_response} ->
+        Incidents.broadcast(incident.id, {:response_created, created_response})
+
         socket =
           socket
           |> assign(:form, to_form(Responses.change_response(%Response{})))
@@ -109,7 +136,7 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
 
   def response(assigns) do
     ~H"""
-    <div class="response">
+    <div class="response" id={@id}>
       <span class="timeline"></span>
       <section>
         <div class="avatar">
