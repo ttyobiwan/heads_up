@@ -1,11 +1,13 @@
 defmodule HeadsUpWeb.IncidentsLive.Show do
-  use HeadsUpWeb, :live_view
+  alias HeadsUpWeb.Presence
   import HeadsUpWeb.{HeadlineComponents}
   alias HeadsUp.Responses.Response
   alias HeadsUp.Responses
   alias Phoenix.LiveView.AsyncResult
   alias HeadsUp.Incidents
   import HeadsUpWeb.BadgeComponents
+
+  use HeadsUpWeb, :live_view
 
   def mount(_, _, socket) do
     {:ok, assign(socket, :form, to_form(Responses.change_response(%Response{})))}
@@ -14,10 +16,24 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
   def handle_params(%{"id" => id}, _uri, socket) do
     if connected?(socket) do
       Incidents.subscribe(id)
+
+      %{current_user: current_user} = socket.assigns
+
+      if current_user do
+        {:ok, _} = Presence.track_incident(id, current_user.username)
+      end
+
+      Presence.subscribe_to_incident(id)
     end
 
     incident = Incidents.get_incident(id, [:category, heroic_response: :user])
     responses = Incidents.list_responses(incident)
+
+    presences =
+      Presence.list("incidents:#{id}")
+      |> Enum.map(fn {username, %{metas: metas}} ->
+        %{id: username, metas: metas}
+      end)
 
     socket =
       socket
@@ -25,6 +41,7 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
       |> assign(:incident, incident)
       |> stream(:responses, responses)
       |> assign(:responses_count, Enum.count(responses))
+      |> stream(:presences, presences)
       |> assign(:urgent_incidents, AsyncResult.loading())
       |> start_async(:fetch_urgent_incidents, fn ->
         IO.puts("Fetching urgent incidents")
@@ -41,8 +58,6 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
   end
 
   def handle_info({:response_created, response}, socket) do
-    IO.puts("created")
-
     socket =
       socket
       |> stream_insert(:responses, response, at: 0)
@@ -52,9 +67,24 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
   end
 
   def handle_info({:incident_updated, incident}, socket) do
-    IO.puts("updated")
-    socket = socket |> assign(:incident, incident) |> put_flash(:info, "Incident got updated")
+    socket =
+      socket
+      |> assign(:incident, incident)
+      |> put_flash(:info, "Incident got updated")
+
     {:noreply, socket}
+  end
+
+  def handle_info({:user_joined, presence}, socket) do
+    {:noreply, stream_insert(socket, :presences, presence)}
+  end
+
+  def handle_info({:user_left, presence}, socket) do
+    if presence.metas == [] do
+      {:noreply, stream_delete(socket, :presences, presence)}
+    else
+      {:noreply, stream_insert(socket, :presences, presence)}
+    end
   end
 
   def handle_async(:fetch_urgent_incidents, {:ok, incidents}, socket) do
@@ -130,6 +160,19 @@ defmodule HeadsUpWeb.IncidentsLive.Show do
           </li>
         </ul>
       </.async_result>
+    </section>
+    """
+  end
+
+  def on_lookers(assigns) do
+    ~H"""
+    <section>
+      <h4>Onlookers</h4>
+      <ul class="presences" id="onlookers" phx-update="stream">
+        <li :for={{dom_id, %{id: username, metas: metas}} <- @presences} id={dom_id}>
+          <.icon name="hero-user-circle-solid" class="w-5 h-5" /> {username} ({length(metas)})
+        </li>
+      </ul>
     </section>
     """
   end

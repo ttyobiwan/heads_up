@@ -2,9 +2,10 @@ defmodule HeadsUpWeb.IncidentsLive.Index do
   alias HeadsUp.Categories
   import HeadsUpWeb.{BadgeComponents, HeadlineComponents}
   alias Phoenix.HTML.Form
-  use HeadsUpWeb, :live_view
   alias HeadsUp.Incidents
   alias HeadsUp.Incidents.Incident
+
+  use HeadsUpWeb, :live_view
 
   def mount(_, _, socket) do
     socket =

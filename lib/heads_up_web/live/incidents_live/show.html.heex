@@ -53,6 +53,7 @@
     </div>
     <div class="right">
       <.urgent_incidents incidents={@urgent_incidents} />
+      <.on_lookers :if={@current_user} presences={@streams.presences} />
       <.back navigate={~p"/incidents"}>Back to incidents</.back>
     </div>
   </div>
